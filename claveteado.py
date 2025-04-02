@@ -51,7 +51,7 @@ if archivo_catalogo and archivo_consultas:
         valor_modelo = str(fila["MODELO"])
 
         # Filtros exactos
-        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False)
+        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
         filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False)
         filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False)
         filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False)
