@@ -31,7 +31,7 @@ if archivo_catalogo and archivo_consultas:
     # Convertir las columnas del catálogo a string y manejar valores nulos
     columnas_catalogo = [col_exacto, col_fuzzy, col_numero, col_transmision, col_modelo]
     for col in columnas_catalogo:
-        df_catalogo[col] = df_catalogo[col].fillna('').astype(str)
+        df_catalogo[col] = df_catalogo[col].fillna('').astype(str).str.upper().str.strip()
 
     # Parámetro para coincidencia fuzzy
     umbral_fuzzy = 0
@@ -51,17 +51,18 @@ if archivo_catalogo and archivo_consultas:
         valor_transmision = fila["TRANSMISION"]
         valor_modelo = fila["MODELO"]
 
-        # Aplicar filtros SOLO si la celda NO está vacía
+        # Empezamos con todo el catálogo
         df_filtrado_parcial = df_catalogo.copy()
-        
-        if valor_marca:
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_exacto].str.contains(valor_marca, na=False, case=False)]
-        if valor_ano:
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_numero].str.contains(valor_ano, na=False, case=False)]
-        if valor_transmision:
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_transmision].str.contains(valor_transmision, na=False, case=False)]
-        if valor_modelo:
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_modelo].str.contains(valor_modelo, na=False, case=False)]
+
+        # Aplicar filtros SOLO si la celda NO está vacía (pero dejando pasar las vacías)
+        if valor_marca.strip():
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_exacto].str.contains(valor_marca, na=False, case=False, regex=False)]
+        if valor_ano.strip():
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_numero].str.contains(valor_ano, na=False, case=False, regex=False)]
+        if valor_transmision.strip():
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_transmision].str.contains(valor_transmision, na=False, case=False, regex=False)]
+        if valor_modelo.strip():
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_modelo].str.contains(valor_modelo, na=False, case=False, regex=False)]
 
         if not df_filtrado_parcial.empty:
             # Coincidencia fuzzy en "DESCRIPCION1"
