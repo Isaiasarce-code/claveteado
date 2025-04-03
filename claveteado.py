@@ -52,12 +52,16 @@ if archivo_catalogo and archivo_consultas:
         valor_modelo = fila["MODELO"]
 
         # Aplicar filtros SOLO si la celda NO está vacía
-        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False) if valor_marca else True
-        filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False) if valor_ano else True
-        filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False) if valor_transmision else True
-        filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False) if valor_modelo else True
-
-        df_filtrado_parcial = df_catalogo[filtro1 & filtro3 & filtro4 & filtro5].copy()
+        df_filtrado_parcial = df_catalogo.copy()
+        
+        if valor_marca:
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_exacto].str.contains(valor_marca, na=False, case=False)]
+        if valor_ano:
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_numero].str.contains(valor_ano, na=False, case=False)]
+        if valor_transmision:
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_transmision].str.contains(valor_transmision, na=False, case=False)]
+        if valor_modelo:
+            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_modelo].str.contains(valor_modelo, na=False, case=False)]
 
         if not df_filtrado_parcial.empty:
             # Coincidencia fuzzy en "DESCRIPCION1"
