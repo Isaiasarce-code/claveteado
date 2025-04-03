@@ -15,10 +15,10 @@ if archivo_catalogo and archivo_consultas:
     df_catalogo = pd.read_csv(archivo_catalogo, encoding='latin1')
     df_consultas = pd.read_csv(archivo_consultas, encoding='latin1')
 
-    # Convertir las columnas relevantes a mayúsculas
+    # Convertir las columnas relevantes a mayúsculas y manejar valores nulos
     columnas_consulta = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "MODELO"]
     for col in columnas_consulta:
-        df_consultas[col] = df_consultas[col].astype(str).str.upper().str.strip()
+        df_consultas[col] = df_consultas[col].fillna('').astype(str).str.upper().str.strip()
 
     # Definir las columnas a usar del catálogo
     col_exacto = "MARCA"
@@ -27,10 +27,10 @@ if archivo_catalogo and archivo_consultas:
     col_transmision = "TRANSMISION"
     col_modelo = "DESCRIPCION2"
 
-    # Convertir las columnas a string para evitar problemas de tipo
+    # Convertir las columnas del catálogo a string y manejar valores nulos
     columnas_catalogo = [col_exacto, col_fuzzy, col_numero, col_transmision, col_modelo]
     for col in columnas_catalogo:
-        df_catalogo[col] = df_catalogo[col].astype(str)
+        df_catalogo[col] = df_catalogo[col].fillna('').astype(str)
 
     # Parámetro para coincidencia fuzzy
     umbral_fuzzy = 0
@@ -44,11 +44,11 @@ if archivo_catalogo and archivo_consultas:
 
     # Iterar sobre todas las filas del archivo de CONSULTA
     for i, fila in df_consultas.iterrows():
-        valor_marca = str(fila["MARCA"])
-        valor_descripcion = str(fila["DESCRIPCION1"])
-        valor_ano = str(fila["AÑO"])
-        valor_transmision = str(fila["TRANSMISION"])
-        valor_modelo = str(fila["MODELO"])
+        valor_marca = fila["MARCA"]
+        valor_descripcion = fila["DESCRIPCION1"]
+        valor_ano = fila["AÑO"]
+        valor_transmision = fila["TRANSMISION"]
+        valor_modelo = fila["MODELO"]
 
         # Filtros exactos
         filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
@@ -109,4 +109,3 @@ if archivo_catalogo and archivo_consultas:
     )
 
     st.success("Proceso completado con éxito.")
-
