@@ -15,11 +15,10 @@ if archivo_catalogo and archivo_consultas:
     df_catalogo = pd.read_csv(archivo_catalogo, encoding='latin1')
     df_consultas = pd.read_csv(archivo_consultas, encoding='latin1')
 
-    # Convertir las columnas relevantes a mayúsculas y manejar valores nulos
+    # Convertir las columnas relevantes a mayúsculas
     columnas_consulta = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "MODELO"]
     for col in columnas_consulta:
-        if col in df_consultas.columns:
-            df_consultas[col] = df_consultas[col].fillna('').astype(str).str.upper().str.strip()
+        df_consultas[col] = df_consultas[col].astype(str).str.upper().str.strip()
 
     # Definir las columnas a usar del catálogo
     col_exacto = "MARCA"
@@ -28,10 +27,10 @@ if archivo_catalogo and archivo_consultas:
     col_transmision = "TRANSMISION"
     col_modelo = "DESCRIPCION2"
 
-    # Convertir las columnas del catálogo a string y manejar valores nulos
+    # Convertir las columnas a string para evitar problemas de tipo
     columnas_catalogo = [col_exacto, col_fuzzy, col_numero, col_transmision, col_modelo]
     for col in columnas_catalogo:
-        df_catalogo[col] = df_catalogo[col].fillna('').astype(str).str.upper().str.strip()
+        df_catalogo[col] = df_catalogo[col].astype(str)
 
     # Parámetro para coincidencia fuzzy
     umbral_fuzzy = 0
@@ -45,24 +44,19 @@ if archivo_catalogo and archivo_consultas:
 
     # Iterar sobre todas las filas del archivo de CONSULTA
     for i, fila in df_consultas.iterrows():
-        valor_marca = fila["MARCA"]
-        valor_descripcion = fila["DESCRIPCION1"]
-        valor_ano = fila["AÑO"]
-        valor_transmision = fila["TRANSMISION"]
-        valor_modelo = fila["MODELO"]
+        valor_marca = str(fila["MARCA"])
+        valor_descripcion = str(fila["DESCRIPCION1"])
+        valor_ano = str(fila["AÑO"])
+        valor_transmision = str(fila["TRANSMISION"])
+        valor_modelo = str(fila["MODELO"])
 
-        # Empezamos con todo el catálogo
-        df_filtrado_parcial = df_catalogo.copy()
+        # Filtros exactos
+        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
+        filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False)
+        filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False)
+        filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False)
 
-        # Aplicar filtros SOLO si la celda NO está vacía (pero dejando pasar las vacías)
-        if valor_marca.strip():
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_exacto].str.contains(valor_marca, na=False, case=False, regex=False)]
-        if valor_ano.strip():
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_numero].str.contains(valor_ano, na=False, case=False, regex=False)]
-        if valor_transmision.strip():
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_transmision].str.contains(valor_transmision, na=False, case=False, regex=False)]
-        if valor_modelo.strip():
-            df_filtrado_parcial = df_filtrado_parcial[df_filtrado_parcial[col_modelo].str.contains(valor_modelo, na=False, case=False, regex=False)]
+        df_filtrado_parcial = df_catalogo[filtro1 & filtro3 & filtro4 & filtro5].copy()
 
         if not df_filtrado_parcial.empty:
             # Coincidencia fuzzy en "DESCRIPCION1"
