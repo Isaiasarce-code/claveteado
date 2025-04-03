@@ -18,7 +18,8 @@ if archivo_catalogo and archivo_consultas:
     # Convertir las columnas relevantes a mayúsculas y manejar valores nulos
     columnas_consulta = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "MODELO"]
     for col in columnas_consulta:
-        df_consultas[col] = df_consultas[col].fillna('').astype(str).str.upper().str.strip()
+        if col in df_consultas.columns:
+            df_consultas[col] = df_consultas[col].fillna('').astype(str).str.upper().str.strip()
 
     # Definir las columnas a usar del catálogo
     col_exacto = "MARCA"
@@ -50,11 +51,11 @@ if archivo_catalogo and archivo_consultas:
         valor_transmision = fila["TRANSMISION"]
         valor_modelo = fila["MODELO"]
 
-        # Filtros exactos
-        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
-        filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False)
-        filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False)
-        filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False)
+        # Aplicar filtros SOLO si la celda NO está vacía
+        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False) if valor_marca else True
+        filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False) if valor_ano else True
+        filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False) if valor_transmision else True
+        filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False) if valor_modelo else True
 
         df_filtrado_parcial = df_catalogo[filtro1 & filtro3 & filtro4 & filtro5].copy()
 
