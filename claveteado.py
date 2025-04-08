@@ -2,6 +2,40 @@ import streamlit as st
 import pandas as pd
 from rapidfuzz import process, fuzz
 
+# Estilo personalizado: fondo rojo y texto blanco
+st.markdown("""
+    <style>
+        body {
+            background-color: #8B0000;  /* Rojo oscuro */
+            color: white;
+        }
+        .stApp {
+            background-color: #8B0000;
+            color: white;
+        }
+        .css-18ni7ap.e8zbici2 {  /* Títulos y textos */
+            color: white;
+        }
+        .css-1v0mbdj.edgvbvh3 {  /* Textos de widget */
+            color: white;
+        }
+        .st-bb {
+            background-color: #8B0000;
+        }
+        .st-cm, .st-cn {
+            color: white;
+        }
+        .css-1cpxqw2.edgvbvh3 { /* Texto de subheader */
+            color: white;
+        }
+        .css-qrbaxs.e16nr0p34 { /* Tabla */
+            background-color: white !important;
+            color: black !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+
 # Título de la app
 st.title("Filtro y Coincidencia de Datos ANA SEGUROS")
 
