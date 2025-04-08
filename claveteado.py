@@ -35,6 +35,24 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Estilo personalizado (tu CSS)
+st.markdown("""
+    <style>
+        /* aquí va tu CSS... */
+    </style>
+""", unsafe_allow_html=True)
+
+# Logo arriba a la derecha
+st.markdown("""
+    <div style="display: flex; justify-content: flex-end;">
+        <img src="https://www.promotoriadeseguros.com.mx/wp-content/uploads/2021/09/logoanaseguros-1024x609.png" 
+             alt="Logo ANA Seguros" width="200" style="margin-top: -60px; margin-right: 10px;">
+    </div>
+""", unsafe_allow_html=True)
+
+# Título principal
+st.title("Filtro y Coincidencia de Datos ANA SEGUROS")
+
 
 # Título de la app
 st.title("CLAVETEADO DE UNIDADES ANA SEGUROS")
