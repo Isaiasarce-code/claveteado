@@ -50,10 +50,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Título principal
-st.title("Filtro y Coincidencia de Datos ANA SEGUROS")
-
-
 # Título de la app
 st.title("CLAVETEADO DE UNIDADES ANA SEGUROS")
 
