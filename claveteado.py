@@ -6,11 +6,11 @@ from rapidfuzz import process, fuzz
 st.markdown("""
     <style>
         body {
-            background-color: #8B0000;  /* Rojo oscuro */
+            background-color: #FF6F61;  /* Rojo oscuro */
             color: white;
         }
         .stApp {
-            background-color: #8B0000;
+            background-color: #FF6F61;
             color: white;
         }
         .css-18ni7ap.e8zbici2 {  /* Títulos y textos */
@@ -20,7 +20,7 @@ st.markdown("""
             color: white;
         }
         .st-bb {
-            background-color: #8B0000;
+            background-color: #FF6F61;
         }
         .st-cm, .st-cn {
             color: white;
@@ -41,7 +41,7 @@ st.title("Filtro y Coincidencia de Datos ANA SEGUROS")
 
 # Subida del archivo de consultas (solo este lo sube el usuario)
 st.subheader("Carga el archivo de consultas")
-archivo_consultas = st.file_uploader("Sube el archivo de consultas", type=["csv"])
+archivo_consultas = st.file_uploader("", type=["csv"])
 
 # Cargar catálogo automáticamente desde GitHub
 url_catalogo = "https://raw.githubusercontent.com/Isaiasarce-code/claveteado/main/CATALOGO.csv"
