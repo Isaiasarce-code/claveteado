@@ -143,6 +143,13 @@ if archivo_consultas:
 
     st.subheader("Descarga el Resultado")
     csv_resultado = df_final.to_csv(index=False, encoding='latin1')
+st.markdown("""
+    <style>
+        div[data-testid="stDownloadButton"] {
+            color: black; /* Cambia el color del texto a negro */
+        }
+    </style>
+""", unsafe_allow_html=True)
     st.download_button(
         label="Descargar CSV",
         data=csv_resultado,
