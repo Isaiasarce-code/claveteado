@@ -10,7 +10,7 @@ st.subheader("Carga el archivo de consultas")
 archivo_consultas = st.file_uploader("Sube el archivo de consultas", type=["csv"])
 
 # Cargar catálogo automáticamente desde GitHub
-url_catalogo = "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/catalogo.csv"
+url_catalogo = "https://raw.githubusercontent.com/Isaiasarce-code/claveteado/blob/main/CATALOGO.csv"
 df_catalogo = pd.read_csv(url_catalogo, encoding='latin1')
 
 if archivo_consultas:
