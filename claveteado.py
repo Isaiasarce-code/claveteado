@@ -1,8 +1,7 @@
 import streamlit as st
-st.set_page_config(layout="wide")
 import pandas as pd
 from rapidfuzz import process, fuzz
-
+st.set_page_config(layout="wide")
 # Estilo personalizado: fondo rojo y texto blanco
 st.markdown("""
     <style>
