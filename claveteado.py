@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 from rapidfuzz import process, fuzz
+
+st.set_page_config(page_title="Mi App", page_icon="📊", menu_items={
+    'Get Help': None,
+    'Report a bug': None,
+    'About': None
+})
+
 st.set_page_config(layout="wide")
 # Estilo personalizado: fondo rojo y texto blanco
 st.markdown("""
