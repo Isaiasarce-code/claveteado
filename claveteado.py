@@ -2,13 +2,16 @@ import streamlit as st
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-st.set_page_config(page_title="Mi App", page_icon="📊", menu_items={
-    'Get Help': None,
-    'Report a bug': None,
-    'About': None
-})
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="CLAVETEADO DE UNIDADES ANA SEGUROS",
+    layout="wide",
+    menu_items={
+        "Get Help": None,
+        "Report a bug": None,
+        "About": None
+    }
+)
 # Estilo personalizado: fondo rojo y texto blanco
 st.markdown("""
     <style>
