@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 from rapidfuzz import process, fuzz
 
 st.set_page_config(layout="wide")
@@ -99,11 +100,17 @@ if archivo_consultas:
         valor_transmision = str(fila["TRANSMISION"])
         valor_modelo = str(fila["MODELO"])
 
-        filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
-        filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False)
-        filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False)
-        filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False)
+       # filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
+       # filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False)
+       # filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False)
+       # filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False)
 
+        filtro1 = df_catalogo[col_exacto].str.contains(re.escape(valor_marca), na=False, case=False)
+        filtro3 = df_catalogo[col_numero].str.contains(re.escape(valor_ano), na=False, case=False)
+        filtro4 = df_catalogo[col_transmision].str.contains(re.escape(valor_transmision), na=False, case=False)
+        filtro5 = df_catalogo[col_modelo].str.contains(re.escape(valor_modelo), na=False, case=False)
+
+        
         df_filtrado_parcial = df_catalogo[filtro1 & filtro3 & filtro4 & filtro5].copy()
 
         if not df_filtrado_parcial.empty:
