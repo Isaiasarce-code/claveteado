@@ -29,7 +29,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Logo en la parte superior derecha
+# Logo superior derecho
 st.markdown("""
     <div style="display: flex; justify-content: flex-end;">
         <img src="https://www.promotoriadeseguros.com.mx/wp-content/uploads/2021/09/logoanaseguros-1024x609.png"
@@ -39,43 +39,42 @@ st.markdown("""
 
 st.title("CLAVETEADO DE UNIDADES ANA SEGUROS")
 
-# Subida del archivo CSV de consultas
+# Subida del archivo de consultas
 st.subheader("Carga el archivo de consultas")
 archivo_consultas = st.file_uploader("", type=["csv"])
 
-# Cargar el catálogo desde GitHub
+# Cargar catálogo desde GitHub
 url_catalogo = "https://raw.githubusercontent.com/Isaiasarce-code/claveteado/main/CATALOGO.csv"
 df_catalogo = pd.read_csv(url_catalogo, encoding='latin1')
 
+# Limpieza básica del catálogo
+columnas_catalogo = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "DESCRIPCION2"]
+for col in columnas_catalogo:
+    df_catalogo[col] = df_catalogo[col].fillna("").astype(str).str.upper().str.strip()
+
 if archivo_consultas:
     df_consultas = pd.read_csv(archivo_consultas, encoding='latin1')
-
     columnas_consulta = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "MODELO"]
     for col in columnas_consulta:
-        df_consultas[col] = df_consultas[col].astype(str).str.upper().str.strip()
+        df_consultas[col] = df_consultas[col].fillna("").astype(str).str.upper().str.strip()
 
     col_exacto = "MARCA"
     col_fuzzy = "DESCRIPCION1"
     col_numero = "AÑO"
     col_transmision = "TRANSMISION"
     col_modelo = "DESCRIPCION2"
-
-    columnas_catalogo = [col_exacto, col_fuzzy, col_numero, col_transmision, col_modelo]
-    for col in columnas_catalogo:
-        df_catalogo[col] = df_catalogo[col].astype(str)
-
     umbral_fuzzy = 0
-    resultados_ordenados = []
 
+    resultados_ordenados = []
     progreso = st.progress(0)
     total_filas = len(df_consultas)
 
     for i, fila in df_consultas.iterrows():
-        valor_marca = str(fila["MARCA"]).strip() if pd.notna(fila["MARCA"]) else ""
-        valor_descripcion = str(fila["DESCRIPCION1"]).strip() if pd.notna(fila["DESCRIPCION1"]) else ""
-        valor_ano = str(fila["AÑO"]).strip() if pd.notna(fila["AÑO"]) else ""
-        valor_transmision = str(fila["TRANSMISION"]).strip() if pd.notna(fila["TRANSMISION"]) else ""
-        valor_modelo = str(fila["MODELO"]).strip() if pd.notna(fila["MODELO"]) else ""
+        valor_marca = fila["MARCA"]
+        valor_descripcion = fila["DESCRIPCION1"]
+        valor_ano = fila["AÑO"]
+        valor_transmision = fila["TRANSMISION"]
+        valor_modelo = fila["MODELO"]
 
         if not valor_descripcion:
             resultados_ordenados.append({
@@ -147,11 +146,11 @@ if archivo_consultas:
     csv_resultado = df_final.to_csv(index=False, encoding='latin1')
 
     st.markdown("""
-    <style>
-        div[data-testid="stDownloadButton"] {
-            color: black;
-        }
-    </style>
+        <style>
+            div[data-testid="stDownloadButton"] {
+                color: black;
+            }
+        </style>
     """, unsafe_allow_html=True)
 
     st.download_button(
