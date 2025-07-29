@@ -69,75 +69,85 @@ if archivo_consultas:
 
     progreso = st.progress(0)
     total_filas = len(df_consultas)
+    
+for i, fila in df_consultas.iterrows():
+    valor_marca = fila["MARCA"]
+    valor_descripcion = fila["DESCRIPCION1"]
+    valor_ano = fila["AÑO"]
+    valor_transmision = fila["TRANSMISION"]
+    valor_modelo = fila["MODELO"]
 
-    for i, fila in df_consultas.iterrows():
-        valor_marca = str(fila["MARCA"]).strip()
-        valor_descripcion = str(fila["DESCRIPCION1"]).strip()
-        valor_ano = str(fila["AÑO"]).strip()
-        valor_transmision = str(fila["TRANSMISION"]).strip()
-        valor_modelo = str(fila["MODELO"]).strip()
+    # Convertir a string solo si no es NaN
+    valor_marca = str(valor_marca).strip() if pd.notna(valor_marca) else ""
+    valor_descripcion = str(valor_descripcion).strip() if pd.notna(valor_descripcion) else ""
+    valor_ano = str(valor_ano).strip() if pd.notna(valor_ano) else ""
+    valor_transmision = str(valor_transmision).strip() if pd.notna(valor_transmision) else ""
+    valor_modelo = str(valor_modelo).strip() if pd.notna(valor_modelo) else ""
 
-        if not valor_descripcion:
-            resultados_ordenados.append({
-                "MARCA": valor_marca,
-                "DESCRIPCION": valor_descripcion,
-                "AÑO": valor_ano,
-                "MODELO": valor_modelo,
-                "TRANSMISION": valor_transmision,
-                "MENSAJE": "DESCRIPCION1 vacía, se requiere para comparar."
-            })
-            progreso.progress((i + 1) / total_filas)
-            continue
-
-        filtros = []
-        if valor_marca:
-            filtros.append(df_catalogo[col_exacto].str.contains(re.escape(valor_marca), na=False, case=False))
-        if valor_ano:
-            filtros.append(df_catalogo[col_numero].str.contains(re.escape(valor_ano), na=False, case=False))
-        if valor_transmision:
-            filtros.append(df_catalogo[col_transmision].str.contains(re.escape(valor_transmision), na=False, case=False))
-        if valor_modelo:
-            filtros.append(df_catalogo[col_modelo].str.contains(re.escape(valor_modelo), na=False, case=False))
-
-        if filtros:
-            filtro_total = filtros[0]
-            for f in filtros[1:]:
-                filtro_total &= f
-            df_filtrado_parcial = df_catalogo[filtro_total].copy()
-        else:
-            df_filtrado_parcial = df_catalogo.copy()
-
-        if not df_filtrado_parcial.empty:
-            mejor_coincidencia, score, idx = process.extractOne(
-                valor_descripcion,
-                df_filtrado_parcial[col_fuzzy],
-                scorer=fuzz.partial_ratio
-            )
-
-            if score >= umbral_fuzzy:
-                df_filtrado = df_filtrado_parcial.loc[[idx]].copy()
-                resultados_ordenados.append(df_filtrado.iloc[0].to_dict())
-            else:
-                resultados_ordenados.append({
-                    "MARCA": valor_marca,
-                    "DESCRIPCION": valor_descripcion,
-                    "AÑO": valor_ano,
-                    "MODELO": valor_modelo,
-                    "TRANSMISION": valor_transmision,
-                    "MENSAJE": "No se encontró coincidencia fuzzy con el umbral requerido."
-                })
-        else:
-            resultados_ordenados.append({
-                "MARCA": valor_marca,
-                "DESCRIPCION": valor_descripcion,
-                "AÑO": valor_ano,
-                "MODELO": valor_modelo,
-                "TRANSMISION": valor_transmision,
-                "MENSAJE": "No se encontraron registros que cumplan los filtros."
-            })
-
+    # Validar que la DESCRIPCION1 no esté vacía (única obligatoria)
+    if not valor_descripcion:
+        resultados_ordenados.append({
+            "MARCA": valor_marca,
+            "DESCRIPCION": valor_descripcion,
+            "AÑO": valor_ano,
+            "MODELO": valor_modelo,
+            "TRANSMISION": valor_transmision,
+            "MENSAJE": "DESCRIPCION1 vacía, se requiere para comparar."
+        })
         progreso.progress((i + 1) / total_filas)
+        continue
 
+    # Aplicar solo los filtros que tengan valores no vacíos
+    filtros = []
+    if valor_marca:
+        filtros.append(df_catalogo[col_exacto].str.contains(re.escape(valor_marca), na=False, case=False))
+    if valor_ano:
+        filtros.append(df_catalogo[col_numero].str.contains(re.escape(valor_ano), na=False, case=False))
+    if valor_transmision:
+        filtros.append(df_catalogo[col_transmision].str.contains(re.escape(valor_transmision), na=False, case=False))
+    if valor_modelo:
+        filtros.append(df_catalogo[col_modelo].str.contains(re.escape(valor_modelo), na=False, case=False))
+
+    if filtros:
+        filtro_total = filtros[0]
+        for f in filtros[1:]:
+            filtro_total &= f
+        df_filtrado_parcial = df_catalogo[filtro_total].copy()
+    else:
+        df_filtrado_parcial = df_catalogo.copy()
+
+    if not df_filtrado_parcial.empty:
+        mejor_coincidencia, score, idx = process.extractOne(
+            valor_descripcion,
+            df_filtrado_parcial[col_fuzzy],
+            scorer=fuzz.partial_ratio
+        )
+
+        if score >= umbral_fuzzy:
+            df_filtrado = df_filtrado_parcial.loc[[idx]].copy()
+            resultados_ordenados.append(df_filtrado.iloc[0].to_dict())
+        else:
+            resultados_ordenados.append({
+                "MARCA": valor_marca,
+                "DESCRIPCION": valor_descripcion,
+                "AÑO": valor_ano,
+                "MODELO": valor_modelo,
+                "TRANSMISION": valor_transmision,
+                "MENSAJE": "No se encontró coincidencia fuzzy con el umbral requerido."
+            })
+    else:
+        resultados_ordenados.append({
+            "MARCA": valor_marca,
+            "DESCRIPCION": valor_descripcion,
+            "AÑO": valor_ano,
+            "MODELO": valor_modelo,
+            "TRANSMISION": valor_transmision,
+            "MENSAJE": "No se encontraron registros que cumplan los filtros."
+        })
+
+    progreso.progress((i + 1) / total_filas)
+
+    
     df_final = pd.DataFrame(resultados_ordenados)
 
     st.subheader("Resultados del Filtrado")
