@@ -4,79 +4,56 @@ import re
 from rapidfuzz import process, fuzz
 
 st.set_page_config(layout="wide")
-# Estilo personalizado: fondo rojo y texto blanco
+
+# Estilo personalizado
 st.markdown("""
     <style>
         body {
-            background-color: #FF6F61;  /* Rojo oscuro */
+            background-color: #FF6F61;
             color: white;
         }
         .stApp {
             background-color: #FF6F61;
             color: white;
         }
-        .css-18ni7ap.e8zbici2 {  /* Títulos y textos */
+        .css-18ni7ap.e8zbici2,
+        .css-1v0mbdj.edgvbvh3,
+        .st-cm, .st-cn,
+        .css-1cpxqw2.edgvbvh3 {
             color: white;
         }
-        .css-1v0mbdj.edgvbvh3 {  /* Textos de widget */
-            color: white;
-        }
-        .st-bb {
-            background-color: #FF6F61;
-        }
-        .st-cm, .st-cn {
-            color: white;
-        }
-        .css-1cpxqw2.edgvbvh3 { /* Texto de subheader */
-            color: white;
-        }
-        .css-qrbaxs.e16nr0p34 { /* Tabla */
+        .css-qrbaxs.e16nr0p34 {
             background-color: white !important;
             color: black !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Estilo personalizado (tu CSS)
-st.markdown("""
-    <style>
-        /* aquí va tu CSS... */
-    </style>
-""", unsafe_allow_html=True)
-
-# Logo arriba a la derecha
+# Logo en la parte superior derecha
 st.markdown("""
     <div style="display: flex; justify-content: flex-end;">
-        <img src="https://www.promotoriadeseguros.com.mx/wp-content/uploads/2021/09/logoanaseguros-1024x609.png" 
+        <img src="https://www.promotoriadeseguros.com.mx/wp-content/uploads/2021/09/logoanaseguros-1024x609.png"
              alt="Logo ANA Seguros" width="200" style="margin-top: -60px; margin-right: 10px;">
     </div>
 """, unsafe_allow_html=True)
 
-# Título de la app
 st.title("CLAVETEADO DE UNIDADES ANA SEGUROS")
 
-# Subida del archivo de consultas (solo este lo sube el usuario)
+# Subida del archivo CSV de consultas
 st.subheader("Carga el archivo de consultas")
 archivo_consultas = st.file_uploader("", type=["csv"])
 
-# Cargar catálogo automáticamente desde GitHub
+# Cargar el catálogo desde GitHub
 url_catalogo = "https://raw.githubusercontent.com/Isaiasarce-code/claveteado/main/CATALOGO.csv"
 df_catalogo = pd.read_csv(url_catalogo, encoding='latin1')
 
-
-#url_catalogo = "https://raw.githubusercontent.com/Isaiasarce-code/claveteado/blob/main/CATALOGO.csv"
-#df_catalogo = pd.read_csv(url_catalogo, encoding='latin1')
-
 if archivo_consultas:
-    # Cargar archivo de consultas
     df_consultas = pd.read_csv(archivo_consultas, encoding='latin1')
 
-    # Convertir columnas relevantes a mayúsculas
     columnas_consulta = ["MARCA", "DESCRIPCION1", "AÑO", "TRANSMISION", "MODELO"]
     for col in columnas_consulta:
         df_consultas[col] = df_consultas[col].astype(str).str.upper().str.strip()
 
-    # Definir columnas relevantes
     col_exacto = "MARCA"
     col_fuzzy = "DESCRIPCION1"
     col_numero = "AÑO"
@@ -94,24 +71,41 @@ if archivo_consultas:
     total_filas = len(df_consultas)
 
     for i, fila in df_consultas.iterrows():
-        valor_marca = str(fila["MARCA"])
-        valor_descripcion = str(fila["DESCRIPCION1"])
-        valor_ano = str(fila["AÑO"])
-        valor_transmision = str(fila["TRANSMISION"])
-        valor_modelo = str(fila["MODELO"])
+        valor_marca = str(fila["MARCA"]).strip()
+        valor_descripcion = str(fila["DESCRIPCION1"]).strip()
+        valor_ano = str(fila["AÑO"]).strip()
+        valor_transmision = str(fila["TRANSMISION"]).strip()
+        valor_modelo = str(fila["MODELO"]).strip()
 
-       # filtro1 = df_catalogo[col_exacto].str.contains(valor_marca, na=False, case=False)
-       # filtro3 = df_catalogo[col_numero].str.contains(valor_ano, na=False, case=False)
-       # filtro4 = df_catalogo[col_transmision].str.contains(valor_transmision, na=False, case=False)
-       # filtro5 = df_catalogo[col_modelo].str.contains(valor_modelo, na=False, case=False)
+        if not valor_descripcion:
+            resultados_ordenados.append({
+                "MARCA": valor_marca,
+                "DESCRIPCION": valor_descripcion,
+                "AÑO": valor_ano,
+                "MODELO": valor_modelo,
+                "TRANSMISION": valor_transmision,
+                "MENSAJE": "DESCRIPCION1 vacía, se requiere para comparar."
+            })
+            progreso.progress((i + 1) / total_filas)
+            continue
 
-        filtro1 = df_catalogo[col_exacto].str.contains(re.escape(valor_marca), na=False, case=False)
-        filtro3 = df_catalogo[col_numero].str.contains(re.escape(valor_ano), na=False, case=False)
-        filtro4 = df_catalogo[col_transmision].str.contains(re.escape(valor_transmision), na=False, case=False)
-        filtro5 = df_catalogo[col_modelo].str.contains(re.escape(valor_modelo), na=False, case=False)
+        filtros = []
+        if valor_marca:
+            filtros.append(df_catalogo[col_exacto].str.contains(re.escape(valor_marca), na=False, case=False))
+        if valor_ano:
+            filtros.append(df_catalogo[col_numero].str.contains(re.escape(valor_ano), na=False, case=False))
+        if valor_transmision:
+            filtros.append(df_catalogo[col_transmision].str.contains(re.escape(valor_transmision), na=False, case=False))
+        if valor_modelo:
+            filtros.append(df_catalogo[col_modelo].str.contains(re.escape(valor_modelo), na=False, case=False))
 
-        
-        df_filtrado_parcial = df_catalogo[filtro1 & filtro3 & filtro4 & filtro5].copy()
+        if filtros:
+            filtro_total = filtros[0]
+            for f in filtros[1:]:
+                filtro_total &= f
+            df_filtrado_parcial = df_catalogo[filtro_total].copy()
+        else:
+            df_filtrado_parcial = df_catalogo.copy()
 
         if not df_filtrado_parcial.empty:
             mejor_coincidencia, score, idx = process.extractOne(
@@ -154,10 +148,11 @@ if archivo_consultas:
     st.markdown("""
     <style>
         div[data-testid="stDownloadButton"] {
-            color: black; /* Cambia el color del texto a negro */
+            color: black;
         }
     </style>
     """, unsafe_allow_html=True)
+
     st.download_button(
         label="Descargar CSV",
         data=csv_resultado,
